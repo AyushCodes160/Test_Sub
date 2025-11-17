@@ -1,0 +1,45 @@
+.getting-started-container {
+  position: relative;
+  min-height: calc(100vh - 56px);
+  overflow: hidden;
+  background: #141414;
+  padding: 3rem 0;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.guide-list,
+.usage-list,
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.guide-list li,
+.usage-list li,
+.tips-list li {
+  padding: 0.75rem 0;
+  margin-bottom: 0.5rem;
+  color: #b3b3b3;
+  font-size: 1rem;
+  line-height: 1.6;
+  border-bottom: 1px solid #333333;
+}
+
+.guide-list li:last-child,
+.usage-list li:last-child,
+.tips-list li:last-child {
+  border-bottom: none;
+}
+
+.guide-list li strong,
+.usage-list li strong {
+  color: #ffffff;
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}

@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #141414;
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+html {
+  background-color: #000000;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Professional text */
+.gradient-text {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Global button styles - All buttons red with black text */
+button.btn,
+a.btn,
+.btn,
+button.btn-outline-professional,
+a.btn-outline-professional,
+.btn-outline-professional,
+button.btn-professional,
+a.btn-professional,
+.btn-professional {
+  background-color: #E50914 !important;
+  border-color: #E50914 !important;
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+button.btn:hover,
+a.btn:hover,
+.btn:hover,
+button.btn-outline-professional:hover,
+a.btn-outline-professional:hover,
+.btn-outline-professional:hover,
+button.btn-professional:hover,
+a.btn-professional:hover,
+.btn-professional:hover {
+  background-color: #f40612 !important;
+  border-color: #f40612 !important;
+  color: #000000 !important;
+}
+
+button.btn:active,
+a.btn:active,
+.btn:active,
+button.btn:focus,
+a.btn:focus,
+.btn:focus,
+button.btn-outline-professional:active,
+a.btn-outline-professional:active,
+.btn-outline-professional:active,
+button.btn-professional:active,
+a.btn-professional:active,
+.btn-professional:active {
+  background-color: #b20710 !important;
+  border-color: #b20710 !important;
+  color: #000000 !important;
+}
+
+/* Navbar link hover animation - Red line */
+.nav-link-animated {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-link-animated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #E50914;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link-animated:hover::after {
+  width: 100%;
+}
+
+.nav-link-animated.active::after {
+  width: 100%;
+  background-color: #E50914;
+}
