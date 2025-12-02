@@ -28,26 +28,60 @@ const writeUsers = (users) => {
   }
 };
 
-const findOrCreateUser = (profile, provider) => {
-  const users = readUsers();
-  
-  let user = users.find(u => u.provider === provider && u.providerId === profile.id);
-  
-  if (!user) {
-    user = {
-      id: Date.now().toString(),
-      email: profile.emails && profile.emails[0] ? profile.emails[0].value : null,
-      username: profile.displayName || profile.username || `${provider}_user_${Date.now()}`,
-      provider: provider,
-      providerId: profile.id,
-      avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
-      createdAt: new Date().toISOString()
-    };
-    users.push(user);
-    writeUsers(users);
+class Mutex {
+  constructor() {
+    this.queue = [];
+    this.locked = false;
   }
-  
-  return user;
+
+  lock() {
+    return new Promise((resolve) => {
+      if (this.locked) {
+        this.queue.push(resolve);
+      } else {
+        this.locked = true;
+        resolve();
+      }
+    });
+  }
+
+  unlock() {
+    if (this.queue.length > 0) {
+      const resolve = this.queue.shift();
+      resolve();
+    } else {
+      this.locked = false;
+    }
+  }
+}
+
+const mutex = new Mutex();
+
+const findOrCreateUser = async (profile, provider) => {
+  await mutex.lock();
+  try {
+    const users = readUsers();
+    
+    let user = users.find(u => u.provider === provider && u.providerId === profile.id);
+    
+    if (!user) {
+      user = {
+        id: Date.now().toString(),
+        email: profile.emails && profile.emails[0] ? profile.emails[0].value : null,
+        username: profile.displayName || profile.username || `${provider}_user_${Date.now()}`,
+        provider: provider,
+        providerId: profile.id,
+        avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
+        createdAt: new Date().toISOString()
+      };
+      users.push(user);
+      writeUsers(users);
+    }
+    
+    return user;
+  } finally {
+    mutex.unlock();
+  }
 };
 
 passport.serializeUser((user, done) => {
@@ -88,30 +122,40 @@ async (email, password, done) => {
 }));
 
 const registerUser = async (email, password, username) => {
-  const users = readUsers();
-  
-  const existingUser = users.find(u => u.email === email);
-  if (existingUser) {
-    throw new Error('User already exists');
+  await mutex.lock();
+  try {
+    const users = readUsers();
+    
+    const existingUser = users.find(u => u.email === email);
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const newUser = {
+      id: Date.now().toString(),
+      email: email,
+      username: username || email.split('@')[0],
+      password: hashedPassword,
+      provider: 'local',
+      providerId: null,
+      avatar: null,
+      createdAt: new Date().toISOString()
+    };
+    
+    users.push(newUser);
+    writeUsers(users);
+    
+    return newUser;
+  } finally {
+    mutex.unlock();
   }
-  
-  const hashedPassword = await bcrypt.hash(password, 10);
-  
-  const newUser = {
-    id: Date.now().toString(),
-    email: email,
-    username: username || email.split('@')[0],
-    password: hashedPassword,
-    provider: 'local',
-    providerId: null,
-    avatar: null,
-    createdAt: new Date().toISOString()
-  };
-  
-  users.push(newUser);
-  writeUsers(users);
-  
-  return newUser;
 };
 
 module.exports = { passport, registerUser, readUsers };

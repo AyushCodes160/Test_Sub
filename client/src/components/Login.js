@@ -7,6 +7,8 @@ import "./Login.css";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const handleGuestLogin = () => {
@@ -17,23 +19,47 @@ function Login() {
     navigate("/");
   };
 
-
-
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
     if (!email || !password) {
-      toast.error("Please enter both email and password");
-      return;
+      toast.error("Please fill in all fields");
+      return false;
+    }
+    
+    if (isSignUp && !username) {
+      toast.error("Username is required");
+      return false;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    const endpoint = isSignUp ? "/auth/register" : "/auth/login";
+    const payload = isSignUp ? { email, password, username } : { email, password };
+
     try {
-      const response = await fetch("http://localhost:5001/auth/login", {
+      const response = await fetch(`http://localhost:5001${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -41,13 +67,13 @@ function Login() {
       if (response.ok && data.success) {
         localStorage.setItem("username", data.user.username);
         localStorage.setItem("authMethod", "email");
-        toast.success(`Welcome back, ${data.user.username}!`);
+        toast.success(isSignUp ? "Account created successfully!" : `Welcome back, ${data.user.username}!`);
         navigate("/");
       } else {
-        toast.error(data.error || "Login failed");
+        toast.error(data.error || "Authentication failed");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Auth error:", error);
       toast.error("Failed to connect to server");
     }
   };
@@ -64,9 +90,21 @@ function Login() {
                     <CodeIcon size={48} color="#E50914" />
                   </div>
                   <h1 className="logo-text gradient-text">MeowCollab</h1>
-                  <p className="tagline">Sign in to start collaborating</p>
+                  <p className="tagline">{isSignUp ? "Create an account to collaborate" : "Sign in to start collaborating"}</p>
                 </div>
-                <form onSubmit={handleEmailLogin} className="email-login-form mb-4">
+                <form onSubmit={handleAuth} className="email-login-form mb-4">
+                  {isSignUp && (
+                    <div className="form-group mb-3">
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="form-control professional-input"
+                        placeholder="Username"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="form-group mb-3">
                     <input
                       type="email"
@@ -91,7 +129,7 @@ function Login() {
                     type="submit"
                     className="btn btn-professional w-100 mb-3"
                   >
-                    Sign in with Email
+                    {isSignUp ? "Sign Up" : "Sign in with Email"}
                   </button>
                 </form>
 
@@ -107,7 +145,13 @@ function Login() {
                 </button>
 
                 <p className="signup-text mt-4">
-                  Don't have an account? <span className="signup-link">Sign up</span>
+                  {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                  <span 
+                    className="signup-link" 
+                    onClick={() => setIsSignUp(!isSignUp)}
+                  >
+                    {isSignUp ? "Sign In" : "Sign up"}
+                  </span>
                 </p>
               </div>
             </div>

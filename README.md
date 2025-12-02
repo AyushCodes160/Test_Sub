@@ -61,18 +61,23 @@ MeowCollab follows a modern **MERN-style** architecture (MongoDB, Express, React
 
 ### 📊 System Architecture (ER Diagram)
 
-Below is the conceptual data model and interaction flow for the application.
+Below is the data model representing the entities stored in the system.
+
+> [!NOTE]
+> **Data Persistence:** User data is stored in a JSON file (`users.json`) on the server. To ensure data integrity during concurrent writes (e.g., multiple users signing up simultaneously), a **Mutex (Locking Mechanism)** is implemented in the backend.
 
 ```mermaid
 erDiagram
     USER ||--o{ ROOM : joins
     USER {
-        string id PK
+        string id PK "Unique Timestamp ID"
         string username
         string email
-        string password_hash
+        string password_hash "Bcrypt Hash"
         string provider "local/google/github"
+        string providerId "OAuth ID"
         string avatar_url
+        timestamp createdAt
     }
     ROOM ||--|{ SESSION : contains
     ROOM {
