@@ -98,6 +98,18 @@ function Home() {
                 >
                   Create New Room
                 </button>
+
+                <div className="divider">
+                  <span>or</span>
+                </div>
+
+                <button
+                  onClick={() => navigate("/getting-started")}
+                  className="btn btn-outline-professional w-100"
+                  style={{ fontSize: "1rem", padding: "12px" }}
+                >
+                  Getting Started
+                </button>
               </div>
             </div>
           </div>
